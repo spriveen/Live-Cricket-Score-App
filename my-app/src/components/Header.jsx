@@ -56,6 +56,20 @@ const Header = ({ onSearch = () => {} }) => {
               </div>
             </div>
           </form>
+          {/* Right */}
+          <div className={headerStyles.navContainer}>
+          <nav className='flex items-center gap-2'>
+             <button className={headerStyles.navButtons}>Live</button>
+              <button className={headerStyles.navButtons}>Fixtures</button>
+               <button className={headerStyles.navButtons}>Teams</button>
+          </nav>
+
+          <div className={headerStyles.authContainer}>
+            <button className={headerStyles.loginButton}>Log in</button>
+             <button className={headerStyles.signupButton}>Sign Up</button>
+
+          </div>
+          </div>
         </div>
       </div>
     </header>
