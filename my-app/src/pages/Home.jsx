@@ -9,6 +9,7 @@ import Loader from '../components/Loader'
 import { getLiveMatches } from '../api/cricApi'
 import UpcomingMatches from '../components/UpcomingMatches'
 import Scoreboard from '../components/Scoreboard'
+import MatchDetail from '../components/MatchDetail'
 
 const Home = () => {
   const [selectedMatch, setSelectedMatch] = useState(null);
@@ -246,6 +247,27 @@ const Home = () => {
               </div>
             </div>
           </aside>
+        </section>
+        {/* detail section */}
+        <section id='match-detail' className={homeStyles.detailsSection}>
+         <div className={homeStyles.detailsCard}>
+        <div className={homeStyles.detailsTitle}>Match Details</div>
+
+        {! selectedMatch && (
+          <div className={homeStyles.quickScoreContent}>
+         No match selected.Click any match card from Live or Upcoming to view details
+          </div>
+        )}
+        {selectedMatch && (
+          <div className={homeStyles.detailsContent}>
+            <MatchDetail matchId={normalizeMatchId (selectedMatch)}/>
+            <div>
+              <div className='text-sm font-medium text-slate-800 mb-3'>Scoreboard</div>
+              <Scoreboard matchId={normalizeMatchId(selectedMatch)} />
+            </div>
+          </div>
+        )}
+         </div>
         </section>
       </main>
 
