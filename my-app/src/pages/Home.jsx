@@ -7,6 +7,7 @@ import ball from '../assets/ball.png'
 import LiveMatch from '../components/LiveMatch'
 import Loader from '../components/Loader'
 import { getLiveMatches } from '../api/cricApi'
+import UpcomingMatches from '../components/UpcomingMatches'
 
 const Home = () => {
   const [selectedMatch, setSelectedMatch] = useState(null);
@@ -246,7 +247,28 @@ const Home = () => {
                 />
               )}
             </div>
+            <div id='upcoming'>
+              <div className={homeStyles.sectionHeader}>
+               <h2 className={homeStyles.sectionTitle}>Upcoming Matches</h2>
+               <div className={homeStyles.sectionSubtitle}>Plan ahead</div>
+              </div>
+              <UpcomingMatches onSelect={(id)=> onSelectMatch(id)} />
+            </div>
           </div>
+
+          {/* Right column */}
+          <aside className={homeStyles.sidebar}>
+           <div className={homeStyles.sidebarSticky}>
+            <div className={homeStyles.quickScoreCard}>
+             <div className={homeStyles.quickScoreHeader}>
+              <div className={homeStyles.quickScoreTitle}>Quick Score</div>
+              <div className={homeStyles.quickScoreStatus}>
+                Live / Selected
+              </div>
+             </div>
+            </div>
+           </div>
+          </aside>
         </section>
       </main>
 
