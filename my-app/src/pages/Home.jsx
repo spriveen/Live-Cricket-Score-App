@@ -12,63 +12,66 @@ import Scoreboard from '../components/Scoreboard'
 import MatchDetail from '../components/MatchDetail'
 
 const Home = () => {
-  const [selectedMatch, setSelectedMatch] = useState(null);
-  const [teamIdInput, setTeamIdInput] = useState('');
-  const [teamId, setTeamId] = useState(null);
-  const [loadingInitial, setLoadingInitial] = useState(true);
-  const [liveList, setLiveList] = useState([]);
-  const [liveError, setLiveError] = useState(null);
-  const stylesInjected = useRef(false);
+  const [selectedMatch, setSelectedMatch] = useState(null)
+  const [teamIdInput, setTeamIdInput] = useState('')
+  const [teamId, setTeamId] = useState(null)
+  const [loadingInitial, setLoadingInitial] = useState(true)
+  const [liveList, setLiveList] = useState([])
+  const [liveError, setLiveError] = useState(null)
+  const stylesInjected = useRef(false)
 
   // Load Google font once
   useEffect(() => {
-    const id = 'poppins-google-font';
-    if (document.getElementById(id)) return;
-    const link = document.createElement('link');
-    link.id = id;
-    link.rel = 'stylesheet';
-    link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap';
-    document.head.appendChild(link);
-  }, []);
+    const id = 'poppins-google-font'
+    if (document.getElementById(id)) return
+    const link = document.createElement('link')
+    link.id = id
+    link.rel = 'stylesheet'
+    link.href =
+      'https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap'
+    document.head.appendChild(link)
+  }, [])
 
   const tryExtract = (resp) => {
-    if (!resp) return null;
-    if (resp.data) return resp.data;
-    if (resp.rawResponse?.data) return resp.rawResponse.data;
-    if (resp.data?.data) return resp.data.data;
-    if (resp.response) return resp.response;
+    if (!resp) return null
+    if (resp.data) return resp.data
+    if (resp.rawResponse?.data) return resp.rawResponse.data
+    if (resp.data?.data) return resp.data.data
+    if (resp.response) return resp.response
     if (resp.body && typeof resp.body === 'string') {
-      try { return JSON.parse(resp.body); } catch {}
+      try {
+        return JSON.parse(resp.body)
+      } catch {}
     }
-    return resp;
-  };
+    return resp
+  }
 
   const flattenLiveMatches = (payload) => {
-    if (!payload) return [];
-    const out = [];
+    if (!payload) return []
+    const out = []
 
-    if (Array.isArray(payload.matches)) out.push(...payload.matches);
-    else if (Array.isArray(payload.data)) out.push(...payload.data);
-    else if (Array.isArray(payload)) out.push(...payload);
+    if (Array.isArray(payload.matches)) out.push(...payload.matches)
+    else if (Array.isArray(payload.data)) out.push(...payload.data)
+    else if (Array.isArray(payload)) out.push(...payload)
 
     if (Array.isArray(payload.typeMatches)) {
       payload.typeMatches.forEach((tm) => {
-        const series = tm.seriesMatches || tm.series || [];
+        const series = tm.seriesMatches || tm.series || []
         if (Array.isArray(series)) {
           series.forEach((s) => {
-            const saw = s.seriesAdWrapper || s;
-            if (Array.isArray(saw?.matches)) out.push(...saw.matches);
-            else if (Array.isArray(s.seriesMatches)) out.push(...s.seriesMatches);
-            else if (Array.isArray(s.matches)) out.push(...s.matches);
-          });
+            const saw = s.seriesAdWrapper || s
+            if (Array.isArray(saw?.matches)) out.push(...saw.matches)
+            else if (Array.isArray(s.seriesMatches)) out.push(...s.seriesMatches)
+            else if (Array.isArray(s.matches)) out.push(...s.matches)
+          })
         }
-      });
+      })
     }
 
-    if (payload.match) out.push(payload.match);
+    if (payload.match) out.push(payload.match)
 
-    const seen = new Set();
-    const deduped = [];
+    const seen = new Set()
+    const deduped = []
     out.forEach((m) => {
       const id =
         m?.match?.id ||
@@ -77,55 +80,57 @@ const Home = () => {
         m?.unique_id ||
         m?.mid ||
         m?.matchInfo?.matchId ||
-        JSON.stringify(m).slice(0, 80);
+        JSON.stringify(m).slice(0, 80)
 
       if (!seen.has(String(id))) {
-        seen.add(String(id));
-        deduped.push({ raw: m, id: String(id) });
+        seen.add(String(id))
+        deduped.push({ raw: m, id: String(id) })
       }
-    });
+    })
 
-    return deduped;
-  };
+    return deduped
+  }
 
   const normalizeMatchId = (id) => {
-    if (id == null) return null;
-    if (typeof id === 'number') return id;
-    const s = String(id);
-    const digits = s.match(/\d{2,}/);
-    return digits ? digits[0] : s;
-  };
+    if (id == null) return null
+    if (typeof id === 'number') return id
+    const s = String(id)
+    const digits = s.match(/\d{2,}/)
+    return digits ? digits[0] : s
+  }
 
   // Fetch live matches
   const fetchInitialLive = useCallback(async () => {
-    setLoadingInitial(true);
-    setLiveError(null);
+    setLoadingInitial(true)
+    setLiveError(null)
     try {
-      const resp = await getLiveMatches();
-      const payload = tryExtract(resp);
-      const matches = flattenLiveMatches(payload);
-      setLiveList(matches);
-      if (matches.length > 0) setSelectedMatch(String(matches[0].id));
+      const resp = await getLiveMatches()
+      const payload = tryExtract(resp)
+      const matches = flattenLiveMatches(payload)
+      setLiveList(matches)
+      if (matches.length > 0) setSelectedMatch(String(matches[0].id))
     } catch (err) {
-      console.warn('Auto-select live match failed', err);
-      setLiveError(err?.message || 'Failed to load live matches');
+      console.warn('Auto-select live match failed', err)
+      setLiveError(err?.message || 'Failed to load live matches')
     } finally {
-      setLoadingInitial(false);
+      setLoadingInitial(false)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
-    fetchInitialLive();
-  }, [fetchInitialLive]);
+    fetchInitialLive()
+  }, [fetchInitialLive])
 
   const onSelectMatch = (id) => {
-    const s = id != null ? String(id) : null;
-    setSelectedMatch(s);
-    document.getElementById('match-detail')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+    const s = id != null ? String(id) : null
+    setSelectedMatch(s)
+    document
+      .getElementById('match-detail')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
-  const heroWrapperStyle = { perspective: '1100px', WebkitPerspective: '1100px' };
-  const heroBoxStyle = { transformStyle: 'preserve-3d', WebkitTransformStyle: 'preserve-3d' };
+  const heroWrapperStyle = { perspective: '1100px', WebkitPerspective: '1100px' }
+  const heroBoxStyle = { transformStyle: 'preserve-3d', WebkitTransformStyle: 'preserve-3d' }
 
   return (
     <div className={homeStyles.root}>
@@ -137,17 +142,23 @@ const Home = () => {
       </div>
 
       <main className={homeStyles.main}>
+        {/* HERO SECTION */}
         <section className={homeStyles.section}>
           <div className={homeStyles.heroWrapper} style={heroWrapperStyle}>
             <div className={homeStyles.heroBox} style={heroBoxStyle}>
-              <div className={homeStyles.heroSpotlight} style={{ background: homeStyles.heroSpotlightGradient }}></div>
+              <div
+                className={homeStyles.heroSpotlight}
+                style={{ background: homeStyles.heroSpotlightGradient }}
+              ></div>
               <div className={homeStyles.heroContent}>
                 <div className={homeStyles.heroText}>
-                  <h1 className={homeStyles.heroTitle}
+                  <h1
+                    className={homeStyles.heroTitle}
                     style={{
                       fontFamily:
                         "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-                    }}>
+                    }}
+                  >
                     Follow every match. <br /> Live scores, stats & news.
                   </h1>
                   <p className={homeStyles.heroSubtitle}>
@@ -156,13 +167,21 @@ const Home = () => {
                   </p>
                   <div className={homeStyles.heroButtons}>
                     <button
-                      onClick={() => document.getElementById('live')?.scrollIntoView({ behavior: 'smooth' })}
+                      onClick={() =>
+                        document
+                          .getElementById('live')
+                          ?.scrollIntoView({ behavior: 'smooth' })
+                      }
                       className={homeStyles.primaryButton}
                     >
                       View live matches
                     </button>
                     <button
-                      onClick={() => document.getElementById('match-detail')?.scrollIntoView({ behavior: 'smooth' })}
+                      onClick={() =>
+                        document
+                          .getElementById('match-detail')
+                          ?.scrollIntoView({ behavior: 'smooth' })
+                      }
                       className={homeStyles.secondaryButton}
                     >
                       Quick Details
@@ -176,16 +195,22 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            <div className={homeStyles.heroShadow}
-              style={{ boxShadow: '0 8px 30px rgba(14, 30, 50, 0.06)', borderRadius: '24px' }}
+            <div
+              className={homeStyles.heroShadow}
+              style={{
+                boxShadow: '0 8px 30px rgba(14, 30, 50, 0.06)',
+                borderRadius: '24px',
+              }}
             ></div>
             <img src={bat} alt="bat" className="hero-bat" />
             <img src={ball} alt="ball" className="hero-ball" />
           </div>
         </section>
 
+        {/* MAIN GRID SECTION */}
         <section className={homeStyles.gridSection}>
           <div className={homeStyles.mainContent}>
+            {/* LIVE MATCHES */}
             <div id="live" className="space-y-4">
               <div className={homeStyles.sectionHeader}>
                 <div className={homeStyles.liveStatus}>
@@ -200,10 +225,15 @@ const Home = () => {
               ) : liveError ? (
                 <div className="text-sm text-rose-600">{liveError}</div>
               ) : (
-                <LiveMatch matches={liveList} onSelect={onSelectMatch} selectedMatch={selectedMatch} />
+                <LiveMatch
+                  matches={liveList}
+                  onSelect={onSelectMatch}
+                  selectedMatch={selectedMatch}
+                />
               )}
             </div>
 
+            {/* UPCOMING MATCHES */}
             <div id="upcoming">
               <div className={homeStyles.sectionHeader}>
                 <h2 className={homeStyles.sectionTitle}>Upcoming Matches</h2>
@@ -213,6 +243,7 @@ const Home = () => {
             </div>
           </div>
 
+          {/* SIDEBAR */}
           <aside className={homeStyles.sidebar}>
             <div className={homeStyles.sidebarSticky}>
               <div className={homeStyles.quickScoreCard}>
@@ -234,8 +265,9 @@ const Home = () => {
                     <div className="mt-3 flex gap-2">
                       <button
                         onClick={() => {
-                          const el = document.getElementById('match-detail');
-                          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          const el = document.getElementById('match-detail')
+                          if (el)
+                            el.scrollIntoView({ behavior: 'smooth', block: 'start' })
                         }}
                         className={homeStyles.quickScoreButton}
                       >
@@ -248,32 +280,46 @@ const Home = () => {
             </div>
           </aside>
         </section>
-        {/* detail section */}
-        <section id='match-detail' className={homeStyles.detailsSection}>
-         <div className={homeStyles.detailsCard}>
-        <div className={homeStyles.detailsTitle}>Match Details</div>
 
-        {! selectedMatch && (
-          <div className={homeStyles.quickScoreContent}>
-         No match selected.Click any match card from Live or Upcoming to view details
+        {/* MATCH DETAIL SECTION */}
+        <section id="match-detail" className={homeStyles.detailsSection}>
+          <div className={homeStyles.detailsCard}>
+            <div className={homeStyles.detailsTitle}>Match Details</div>
+
+            {!selectedMatch && (
+              <div className={homeStyles.quickScoreContent}>
+                No match selected. Click any match card from Live or Upcoming to view details.
+              </div>
+            )}
+
+            {selectedMatch && (
+              <div className={homeStyles.detailsContent}>
+                <MatchDetail matchId={normalizeMatchId(selectedMatch)} />
+                <div>
+                  <div className="text-sm font-medium text-slate-800 mb-3">Scoreboard</div>
+                  <Scoreboard matchId={normalizeMatchId(selectedMatch)} />
+                </div>
+              </div>
+            )}
           </div>
-        )}
-        {selectedMatch && (
-          <div className={homeStyles.detailsContent}>
-            <MatchDetail matchId={normalizeMatchId (selectedMatch)}/>
-            <div>
-              <div className='text-sm font-medium text-slate-800 mb-3'>Scoreboard</div>
-              <Scoreboard matchId={normalizeMatchId(selectedMatch)} />
+        </section>
+
+        {/* TEAM SECTION */}
+        <section id="team-section" className={homeStyles.teamSection}>
+          {teamId && (
+            <div className={homeStyles.teamCard}>
+              <div className={homeStyles.teamTitle}>Team Preview: {teamId}</div>
+              <div className={homeStyles.quickScoreContent}>
+                (Team detail component not included — wire to your team API using teamId)
+              </div>
             </div>
-          </div>
-        )}
-         </div>
+          )}
         </section>
       </main>
 
       <Footer />
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
