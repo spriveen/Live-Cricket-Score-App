@@ -206,7 +206,18 @@ const MatchDetail = ( {matchId, className = ''}) => {
          <div className={matchDetailStyles.summaryTitle}>
             Match Summary
          </div>
-         
+         <div className={matchDetailStyles.summaryText}>
+           {(center && center.match?.status)|| (hscard && hscard.status)||(scard && scard.status)|| "-"}
+         </div>
+         {center?.match?.venueInfo && (
+            <div className={matchDetailStyles.venueText}>
+                {center.match.venueInfo.ground}  • {""}
+                {center.match.venueInfo.city}
+            </div>
+         )}
+        </div>
+        <div className={matchDetailStyles.playersCard}>
+        <div className={matchDetailStyles.playersTitle}>Players</div>
         </div>
        </aside>
        </div> 
