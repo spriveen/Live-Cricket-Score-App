@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const BASE = 'https://cricbuzz-cricket.p.rapidapi.com';
-const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY || '7e41b5de69mshb70f4190d0c0994p17dfd6jsnb5f1fac6da99';
+const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY || 'da063df633msh433f8be23bcecfcp11cfb8jsn9a76665b9154';
 // '7e41b5de69mshb70f4190d0c0994p17dfd6jsnb5f1fac6da99';
 
 const RAPIDAPI_HOST = import.meta.env.VITE_RAPIDAPI_HOST || 'cricbuzz-cricket.p.rapidapi.com';

@@ -4,6 +4,7 @@ import { matchDetailStyles } from '../assets/dummyStyles'
 import Loader from './Loader';
 import ScoreCard from './ScoreCard';
 import Scoreboard from './Scoreboard';
+import PlayerList from './PlayerList';
 
 const MatchDetail = ( {matchId, className = ''}) => {
     const [center, setCenter] = useState(null);
@@ -218,6 +219,13 @@ const MatchDetail = ( {matchId, className = ''}) => {
         </div>
         <div className={matchDetailStyles.playersCard}>
         <div className={matchDetailStyles.playersTitle}>Players</div>
+         <PlayerList player={players} onSelect={(p)=> console.log('player selected',p)}
+            compact/>
+            {(!players || players.length === 0) && (
+                <div className={matchDetailStyles.noPlayersText}>
+              No player data avaliable
+                </div>
+            )}
         </div>
        </aside>
        </div> 
